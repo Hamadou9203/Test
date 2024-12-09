@@ -5,4 +5,4 @@ while j<6:
 	j=j+1
 	print(i)
 	i=i+1
-print('fini')
+print('liste fournie')
