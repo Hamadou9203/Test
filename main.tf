@@ -150,15 +150,6 @@ resource "aws_instance" "web" {
   subnet_id              = aws_subnet.public_subnets["public_subnet_1"].id
   vpc_security_group_ids = [aws_security_group.instance_sg.id]
 
-  user_data = <<-EOF
-		#!/bin/bash
-    sudo apt-get update
-		sudo apt-get install -y apache2
-		sudo systemctl start apache2
-		sudo systemctl enable apache2
-		sudo echo "<h1>Hello mon coeur d'amour</h1>" > /var/www/html/index.html
-	EOF
-
   tags = {
     Name = "my-ec2-instance"
   }
