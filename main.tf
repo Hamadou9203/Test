@@ -144,16 +144,39 @@ resource "aws_security_group" "instance_sg" {
 
 #create EC2 instance 
 resource "aws_instance" "web" {
+  for_each       = var.public_subnets
+  #subnet_id      = each.value.id
   ami           = "ami-0453ec754f44f9a4a"
   instance_type = "t2.micro"
+  availability_zone       = tolist(data.aws_availability_zones.available.names)[each.value]
 
-  subnet_id              = aws_subnet.public_subnets["public_subnet_1"].id
+  #subnet_id              = aws_subnet.public_subnets["public_subnet_1"].id
+  subnet_id              = aws_subnet.public_subnets[each.key].id
   vpc_security_group_ids = [aws_security_group.instance_sg.id]
+  
+  user_data = <<-EOF
 
+   #!/bin/bash
+
+   sudo yum update -y
+
+   sudo yum install httpd -y
+
+   sudo systemctl enable httpd
+
+   sudo systemctl start httpd
+
+   echo "<html><body><div>This is a test webserver!</div></body></html>" > /var/www/html/index.html
+
+   EOF
+   
   tags = {
-    Name = "my-ec2-instance"
+    Name = "my-ec2-instance-${each.value}"
+    
   }
 }
-output "public_ip" {
-  value = aws_instance.web.public_ip
-}
+
+#output "public_ip" {
+  #for_each       = var.public_subnets
+  #value = aws_instance.web[each.key].public_ip
+#}
