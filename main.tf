@@ -169,14 +169,15 @@ resource "aws_instance" "web" {
    echo "<html><body><div>This is a test webserver!</div></body></html>" > /var/www/html/index.html
 
    EOF
-   
+
   tags = {
     Name = "my-ec2-instance-${each.value}"
     
   }
 }
 
-#output "public_ip" {
+output "public_ip" {
   #for_each       = var.public_subnets
   #value = aws_instance.web[each.key].public_ip
-#}
+  value = [for ip in aws_instance.web: ip.public_ip]
+}
